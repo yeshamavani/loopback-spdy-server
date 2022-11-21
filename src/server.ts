@@ -25,15 +25,6 @@ async function http2SpdyServer() {
   lbApp.boot().then(async () => {
     await lbApp.start();
     const url = lbApp.restServer.url;
-    server.on('request', (req, res) => {
-      // infact no need to translate the request and response
-      //Atleast for now will have to still check other edge cases
-      /*lbApp.requestHandler(
-        requestAdapter(req.spdyStream),
-        responseAdapter(res)
-      ); */
-      lbApp.requestHandler(req, res);
-    });
     //ignore the warnings
     server.on('warning', warn => {
       console.log(warn.stack);
