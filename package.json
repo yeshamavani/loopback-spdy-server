@@ -6,7 +6,7 @@
     "loopback-application",
     "loopback"
   ],
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
     "node": "14 || 16 || 17 || 18"

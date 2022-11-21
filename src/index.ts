@@ -1,15 +1,39 @@
+import * as fs from 'fs';
+import path from 'path';
+import spdy from 'spdy';
 import {ApplicationConfig, NormalLoopbackApplication} from './application';
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
+  const spdyOptions: spdy.ServerOptions = {
+    key: fs.readFileSync(
+      path.join(__dirname, '..', 'cert-files', 'localhost-privkey.pem'),
+    ),
+    cert: fs.readFileSync(
+      path.join(__dirname, '..', 'cert-files', 'localhost-cert.pem'),
+    ),
+  };
+
+  options.rest.listenOnStart = false;
+
   const app = new NormalLoopbackApplication(options);
   await app.boot();
   await app.start();
 
-  const url = app.restServer.url;
-  console.log(`Server is running at ${url}`);
-  console.log(`Try ${url}/ping`);
+  // create spdy h2 server
+  const server = spdy.createServer(spdyOptions, app.requestHandler);
+
+  //ignore the warnings
+  server.on('warning', warn => {
+    console.log(warn.stack);
+  });
+
+  server.listen(3000, () => {
+    console.log(
+      `Listening on https://{app.options.rest.host}:${app.options.rest.port}/`,
+    );
+  });
 
   return app;
 }
@@ -19,7 +43,7 @@ if (require.main === module) {
   const config = {
     rest: {
       port: +(process.env.PORT ?? 3000),
-      host: process.env.HOST,
+      host: process.env.HOST ?? 'localhost',
       // The `gracePeriodForClose` provides a graceful close for http/https
       // servers with keep-alive clients. The default value is `Infinity`
       // (don't force-close). If you want to immediately destroy all sockets
