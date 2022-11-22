@@ -25,11 +25,6 @@ export class NormalLoopbackApplication extends BootMixin(
     // Set up default home page
     this.static('/', path.join(__dirname, '../public'));
 
-    // this.bind(RestBindings.SequenceActions.SEND).toProvider(Http2SendProvider);
-    // this.bind(RestBindings.SequenceActions.REJECT).toProvider(
-    //   Http2RejectProvider,
-    // );
-
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({
       path: '/explorer',
